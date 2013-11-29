@@ -1,0 +1,11 @@
+<div id="bits" ng-controller="BitsController">
+    <button ng-click="no=no*1-1">-</button>
+    <input size="4" ng-model="no" onfocus="this.select()"/>
+    <button ng-click="no=no*1+1">-</button>
+    <ul>
+        <li ng-repeat="b in [1,2,4,8,16,32,64,128]"
+            ng-click="xor(b)"
+            ng-class="lit(b)"></li>
+    </ul>
+
+</div>
