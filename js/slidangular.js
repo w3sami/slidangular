@@ -34,7 +34,7 @@ slidangular.config(function ($routeProvider) {
             controller: 'CodeController'
         })
         .when('/slide/:name', {
-            template:  '<div ng-include="\'html/slide/\' + name + \'.html\'"></div>',
+            template:  '<div ng-include="\'html/slide/\' + name + \'.html?rev=' + slidangular.rev + '\'"></div>',
             controller: 'SlideController'
         })
         .when('/bits', {
@@ -44,7 +44,6 @@ slidangular.config(function ($routeProvider) {
 });
 
 slidangular.controller('SlideController', function($scope, $routeParams) {
-console.debug($routeParams.name);
     $scope.name = $routeParams.name;
 
 });
@@ -171,12 +170,14 @@ slidangular.factory('Iframe', function() {
     };
 });
 
-slidangular.directive('code', function($http, $timeout) {
+slidangular.directive('code', function($http) {
     return function(scope, element, attributes) {
             $http.get(attributes.code.replace(';', '/', 'g')).success(function(html) {
-                element.html('<pre class="prettyprint">' + html.replace('<', '&lt;', 'g') + '</pre>');
+                element.html('<pre class="prettyprint">' +
+                    $('<div>').text(html).html() + // html encode the data
+                    '</pre>'
+                );
                 window.prettyPrint();
-                $timeout(function() { });
             });
 
     };
