@@ -10,7 +10,7 @@ slidangular.factory('FireBase', function(angularFire)
                 currentSlide: null,
                 currentSlideIndex: 0,
                 chat: [],
-                user: {},
+                users: {},
                 chatEnabled: true
             };
 
@@ -25,13 +25,16 @@ slidangular.factory('User', function($cookieStore)
     return {
         get: function($scope)
         {
-            var user = $cookieStore.get('user');
-            if(!user) {
-                var user = Math.random();
-                $cookieStore.put('user', user);
+            var cookieId = $cookieStore.get('cookieId');
+            if(!cookieId) {
+                var cookieId = String(Math.random()).replace('.', '') * 1;
+                $cookieStore.put('cookieId', cookieId);
             }
-            $scope.cookieId = user;
-            $scope.currentUser = $scope.page.user[user];
+            $scope.cookieId = cookieId;
+            console.debug($scope.page.users);
+            if($scope.page.users[cookieId]) {
+                $scope.currentUser = {name: $scope.page.users[cookieId]};
+            }
         }
     }
 });
@@ -130,15 +133,16 @@ slidangular.controller('ChatController', function($scope) {
         if($scope.page.chat.length > 20) {
             $scope.page.chat.splice(0, 1);
         }
+        $scope.page.users[$scope.cookieId] = $scope.currentUser.name;
         $scope.message.content = "";
         $('.chat input')[1].focus();
     };
 });
 slidangular.controller('EditController', function($scope, Iframe, FireBase, User) {
 
-    FireBase.connect($scope, 'page');
-
-    User.get($scope);
+    FireBase.connect($scope, 'page').then(function(){
+        User.get($scope);
+    });
 
     //var copy = JSON.parse(JSON.stringify($scope.page));
 
@@ -279,40 +283,3 @@ slidangular.directive('bits', function() {
         }
     }
 });
-
-   /*
-            var scope = $rootScope.$new(true),
-                deferredModal = $q.defer(),
-                rejectDeferred = function() {
-                    deferredModal.reject();
-                },
-                promises = 1, // the template being numero uno
-                data = {scope: scope};
-
-            $http.get(
-                    options.templateUrl + '?rev=' + apuri.rev // rev better than cache??
-                ).success(function(response)
-                {
-                    var iframeElement =
-                    modalElement.html(response);
-
-                    var component = $compile(modalElement)(scope);
-                    data.modal =  component;
-
-                    $timeout(function(){
-
-                        component.dialog({
-                            autoOpen: false,
-                            modal: true,
-                            title: options.title
-                        });
-                        component.dialog("open");
-
-                        promises --;
-                        if(promises == 0) {
-                            deferredModal.resolve(data);
-                        }
-                    });
-
-                }).error(rejectDeferred);
-       */

@@ -20,6 +20,14 @@
   right: 1%;
   padding: 1%;
   position: absolute; }
+  .chat .names {
+    background: none repeat scroll 0 0 rgba(255, 0, 0, 0.92);
+    border-radius: 13px;
+    float: right;
+    height: 100%;
+    padding: 1%; }
+    .chat .names div {
+      white-space: nowrap; }
 
 ul, li {
   padding: 0;
