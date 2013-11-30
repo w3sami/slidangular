@@ -110,9 +110,9 @@ slidangular.controller('SlidangularController', function($scope) {
 
 slidangular.controller('ViewController', function($scope, FireBase, Iframe, $cookieStore, User) {
 
-    FireBase.connect($scope, 'page');
-
-    User.get($scope);
+    FireBase.connect($scope, 'page').then(function(){
+        User.get($scope);
+    });
 
     $scope.render = function(slide)
     {
