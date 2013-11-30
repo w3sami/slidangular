@@ -1,17 +1,43 @@
-var slidangular = angular.module("slidangular", ["firebase"]);
+var slidangular = angular.module("slidangular", ['firebase', 'ui.sortable', 'ngCookies']);
 
-var getFb = function(name)
+slidangular.factory('FireBase', function(angularFire)
 {
-    return new Firebase("https://slidangular.firebaseio.com/" + name);
+    return {
+        connect: function($scope, name) {
 
-};
+            $scope.page = {
+                slides: [],
+                currentSlide: null,
+                currentSlideIndex: 0,
+                chat: [],
+                user: {},
+                chatEnabled: true
+            };
 
-$(function()
-{
-
-
-
+            var fbRef = new Firebase("https://slidangular.firebaseio.com/" + name);
+            return angularFire(fbRef, $scope, name);
+        }
+    };
 });
+
+slidangular.factory('User', function($cookieStore)
+{
+    return {
+        get: function($scope)
+        {
+            var user = $cookieStore.get('user');
+            if(!user) {
+                var user = Math.random();
+                $cookieStore.put('user', user);
+            }
+            $scope.cookieId = user;
+            $scope.currentUser = $scope.page.user[user];
+        }
+    }
+});
+
+//var auth = new FirebaseSimpleLogin(fbRef, function(error, user) { });
+//auth.login('github');
 
 slidangular.rev = Math.random();
 
@@ -25,7 +51,7 @@ slidangular.config(function ($routeProvider) {
             templateUrl: 'html/edit.html?rev=' + slidangular.rev,
             controller: 'EditController'
         })
-        .when('/view', {
+        .when('/', {
             templateUrl: 'html/view.html?rev=' + slidangular.rev,
             controller: 'ViewController'
         })
@@ -43,7 +69,9 @@ slidangular.config(function ($routeProvider) {
         });
 });
 
-slidangular.controller('SlideController', function($scope, $routeParams) {
+slidangular.controller('SlideController', function($scope, $routeParams, FireBase) {
+
+    FireBase.connect($scope, 'page');
     $scope.name = $routeParams.name;
 
 });
@@ -54,7 +82,7 @@ slidangular.controller('CodeController', function($scope, $routeParams) {
 
 });
 
-slidangular.controller('BitsController', function($scope, angularFire) {
+slidangular.controller('BitsController', function($scope) {
 
     $scope.no = 0;
 
@@ -74,22 +102,14 @@ slidangular.controller('BitsController', function($scope, angularFire) {
     }
 });
 
-slidangular.controller('SlidangularController', function($scope, angularFire) {
+slidangular.controller('SlidangularController', function($scope) {
 });
 
-slidangular.controller('ViewController', function($scope, angularFire, Iframe) {
+slidangular.controller('ViewController', function($scope, FireBase, Iframe, $cookieStore, User) {
 
-    var bindFb = function(name)
-    {
-        angularFire(getFb(name), $scope, name);
-    };
+    FireBase.connect($scope, 'page');
 
-    $scope.page = {
-        slides: [],
-        currentSlide: null
-    };
-
-    bindFb('page');
+    User.get($scope);
 
     $scope.render = function(slide)
     {
@@ -99,51 +119,48 @@ slidangular.controller('ViewController', function($scope, angularFire, Iframe) {
     };
 });
 
-slidangular.controller('EditController', function($scope, angularFire, Iframe) {
+slidangular.controller('ChatController', function($scope) {
 
-    var bindFb = function(name)
-    {
-        var fbRef = getFb(name);
-        angularFire(fbRef, $scope, name);
+    $scope.message = {content: ''};
 
-        return fbRef;
+    $scope.addMessage = function() {
+        $scope.page.chat.push({
+            from: $scope.page.currentUser.name, content: $scope.message.content
+        });
+        if($scope.page.chat.length > 20) {
+            $scope.page.chat.splice(0, 1);
+        }
+        $scope.message.content = "";
+        $('.chat input')[1].focus();
     };
+});
+slidangular.controller('EditController', function($scope, Iframe, FireBase, User) {
 
-    $scope.page = {
-        slides: [],
-        currentSlide: null
-    };
+    FireBase.connect($scope, 'page');
 
-    var fbRef = bindFb('page');
-    //var auth = new FirebaseSimpleLogin(fbRef, function(error, user) { });
-    //auth.login('github');
+    User.get($scope);
 
     //var copy = JSON.parse(JSON.stringify($scope.page));
 
     $scope.add = function(e) {
         $scope.page.slides.push({name: $scope.newName, url: $scope.newUrl});
-        //$scope.name = "";
     };
 
     $scope.save = function(e) {
-        $scope.page.slides.splice($scope.page.slides.indexOf($scope.page.currentSlide), 1, $scope.page.currentSlide);
-        return;
-        var slides = $scope.slides,
-            index = slides.indexOf($scope.currentSlide),
-            slide = slides[index];
-
-        slide.name = $scope.currentSlide.name;
-        slide.url = $scope.currentSlide.url;
+        $scope.page.slides.splice($scope.page.currentSlideIndex, 1, $scope.page.currentSlide);
     };
 
     $scope.selectSlide = function(slide)
     {
         $scope.page.currentSlide = slide;
+        $scope.page.currentSlideIndex = $scope.page.slides.indexOf(slide);
+        $scope.page.currentSlide.index = 0;
     };
 
-    $scope.delete = function(slide)
+    $scope.delete = function()
     {
-        $scope.page.slides.splice($scope.page.slides.indexOf(slide), 1);
+        $scope.page.slides.splice($scope.page.currentSlideIndex, 1);
+        $scope.page.currentSlide = $scope.page.slides[$scope.page.slides.length - 1];
     };
 
     $scope.clear = function()
@@ -158,6 +175,20 @@ slidangular.controller('EditController', function($scope, angularFire, Iframe) {
         return Iframe.render(slide.url);
     };
 
+    $scope.prev = function()
+    {
+        if($scope.page.currentSlide.index) $scope.page.currentSlide.index --;
+    };
+
+    $scope.next = function()
+    {
+        if($scope.page.currentSlide.index < $scope.page.currentSlide.pages) $scope.page.currentSlide.index ++;
+    };
+
+    $scope.zero = function()
+    {
+        $scope.page.currentSlide.index = 0;
+    };
 });
 
 slidangular.factory('Iframe', function() {
@@ -165,20 +196,44 @@ slidangular.factory('Iframe', function() {
     return {
         render: function(url) {
 
-            return '<iframe src="' + url + '">';
+            return '<iframe src="' + url + '?rev=' + slidangular.rev + '">';
         }
     };
 });
 
-slidangular.directive('code', function($http) {
+slidangular.directive('ngBlur', function() {
+    return function( scope, element, attributes ) {
+        element.bind('blur', function() {
+            scope.$apply(attributes.ngBlur);
+        });
+    };
+});
+
+slidangular.directive('code', function($http, $timeout) {
     return function(scope, element, attributes) {
-            $http.get(attributes.code.replace(';', '/', 'g')).success(function(html) {
+        //if(!attributes.code) return;
+        $timeout(function(){
+            $http.get(attributes.code.replace(/;/g, '/') + '?rev=' + slidangular.rev).success(function(html) {
                 element.html('<pre class="prettyprint">' +
                     $('<div>').text(html).html() + // html encode the data
                     '</pre>'
                 );
                 window.prettyPrint();
             });
+        });
+
+    };
+});
+
+slidangular.directive('edit', function($http) {
+    return function(scope, element, attributes) {
+        $http.get(attributes.code.replace(/;/g, '/') + '?rev=' + slidangular.rev).success(function(html) {
+            element.html('<pre class="prettyprint">' +
+                $('<div>').text(html).html() + // html encode the data
+                '</pre>'
+            );
+            window.prettyPrint();
+        });
 
     };
 });

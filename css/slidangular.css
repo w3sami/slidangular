@@ -1,19 +1,38 @@
 .view {
   width: 100%;
-  height: 90%;
-  border: 1px solid red; }
+  height: 100%; }
+
+.view-wrap {
+  width: 70%;
+  height: 100%;
+  float: left; }
+
+#url {
+  position: absolute; }
+  #url input {
+    width: 500px; }
+
+.chat {
+  background: none repeat scroll 0 0 rgba(0, 50, 114, 0.92);
+  border-radius: 13px;
+  bottom: 1%;
+  color: #FFFFFF;
+  right: 1%;
+  padding: 1%;
+  position: absolute; }
 
 ul, li {
   padding: 0;
   margin: 0; }
 
 #slides {
-  width: 16%;
+  width: 20%;
   float: left; }
   #slides ul {
     width: 300px;
     float: left;
-    height: 100%; }
+    height: 60%;
+    overflow-y: auto; }
     #slides ul li {
       list-style-type: none;
       padding: 5px;
@@ -28,8 +47,8 @@ ul, li {
 
 #view {
   float: right;
-  width: 80%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   border: 1px solid blue; }
   #view iframe {
     width: 100%;

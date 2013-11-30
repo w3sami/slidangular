@@ -1,3 +1,5 @@
-<span style="font-size: 2000%; display: block; float: left;">I </span>
-<img style="float: left;margin-top: 20%;" src="w3school/red-heart.jpg" width="200" />
-<img style="float: left;" src="w3school/Angular.png" />
+<span ng-show="page.currentSlide.index > 0" style="font-size: 2000%; display: block; float: left;">I </span>
+<img ng-show="page.currentSlide.index > 1" style="float: left;margin-top: 20%;" src="w3school/red-heart.jpg" width="200" />
+<img ng-show="page.currentSlide.index > 2" style="float: left;" src="w3school/Angular.png" />
+<div style="clear: both;"></div>
+<div ng-show="page.currentSlide.index > 3" code="html;slide;start.html" style="width: 85%; overflow: hidden"></div>

@@ -1,0 +1,16 @@
+<div class="chat" ng-show="page.chatEnabled" ng-controller="ChatController">
+    <form ng-submit="addMessage()">
+
+        <div ng-repeat="message in page.chat">
+            <em>{{message.from}}: </em>{{message.content}}
+        </div>
+
+        Your name: <input type="text" ng-model="page.currentUser.name" />
+
+        <input type="text" ng-model="message.content" placeholder="Message..." />
+        <button class="btn" type="submit">
+            <i class="icon-reply"> Send</i>
+        </button>
+    </form>
+
+</div>

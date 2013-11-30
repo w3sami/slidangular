@@ -1,19 +1,25 @@
 <html ng-app="slidangular">
 <head>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.5/angular.min.js'></script>
-    <script src='https://cdn.firebase.com/v0/firebase.js'></script>
-    <script src='https://cdn.firebase.com/libs/angularfire/0.3.0/angularfire.min.js'></script>
-    <script type='text/javascript' src='https://cdn.firebase.com/v0/firebase-simple-login.js'></script>
-    <script src='js/slidangular.js'></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.8/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/0.3.0/angularfire.min.js"></script>
+    <script src="https://cdn.firebase.com/v0/firebase-simple-login.js"></script>
+
     <script src="js/prettify.min.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    <script src="js/sortable.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="js/toastr.js"></script>
+    <script src="js/slidangular.js"></script>
 
     <link type="text/css" rel="stylesheet" href="css/slidangular.css" />
     <link href="css/prettify.css" rel="stylesheet" type="text/css">
 </head>
 <body ng-controller="SlidangularController">
-    <div ng-view class="view">
-        Loading...
-    </div>
+<div ng-view class="view">
+    Loading...
+</div>
 </body>
 </html>

@@ -1,27 +1,42 @@
 <div id="slides">
-    <ul>
+    <ul ui-sortable ng-model="page.slides">
         <li ng-repeat="slide in page.slides"
-            ng-click="page.currentSlide = slide"
+            ng-click="selectSlide(slide)"
             ng-class="{active: page.currentSlide.name == slide.name}">
             {{ slide.name }}
-            <span ng-click="delete(slide)">remove</span>
         </li>
     </ul>
-    <div id="slide-properties">
+
+    <div>
+        <button ng-click="prev()">&lt;</button>
+        <button ng-click="zero()">0</button>
+        <button ng-click="next()">&gt;</button>
+        <button ng-click="page.chatEnabled = !page.chatEnabled">chat</button>
+        <input type="text" ng-model="page.currentSlide.name" placeholder="Name">
+        <input type="text" ng-model="page.currentSlide.url" placeholder="Url">
+        <input type="text" ng-model="page.currentSlide.index" placeholder="Index">
+        <input type="text" ng-model="page.currentSlide.pages" placeholder="Pages">
+
+        <button ng-click="save()">save</button>
+        <br /><br />
+        <button ng-click="delete()">remove</button>
+        <br />
         <input type="text" ng-model="newName" placeholder="Name">
         <input type="text" ng-model="newUrl" placeholder="Url">
         <button ng-click="add()">add</button>
 
-        <input type="text" ng-model="page.currentSlide.name" placeholder="Name">
-        <input type="text" ng-model="page.currentSlide.url" placeholder="Url">
-        <button ng-click="save()">save</button>
 
         <br /><br />
 
-        <button ng-click="clear()">clear</button>
+        <button ng-click="clear()">clear all</button>
+        <button ng-click="page.hideUrl = !page.hideUrl">{{ page.hideUrl && 'show' || 'hide' }} url</button>
     </div>
 </div>
+{{cookieId}}
+<div class="view-wrap">
+    <div ng-show="!page.hideUrl" id="url"><input type="text" ng-model="page.currentSlide.url" placeholder="Url"></div>
 
-<div id="url"><input type="text" ng-model="page.currentSlide.url" placeholder="Url"></div>
+    <div ng-include src="'html/chat.html'"></div>
 
-<div id="view" ng-bind-html-unsafe="render(page.currentSlide)"></div>
+    <div id="view" ng-bind-html-unsafe="render(page.currentSlide)"></div>
+</div>
