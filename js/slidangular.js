@@ -125,7 +125,7 @@ slidangular.controller('ChatController', function($scope) {
 
     $scope.addMessage = function() {
         $scope.page.chat.push({
-            from: $scope.page.currentUser.name, content: $scope.message.content
+            from: $scope.currentUser.name, content: $scope.message.content
         });
         if($scope.page.chat.length > 20) {
             $scope.page.chat.splice(0, 1);
