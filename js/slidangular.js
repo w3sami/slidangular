@@ -31,10 +31,11 @@ slidangular.factory('User', function($cookieStore)
                 $cookieStore.put('cookieId', cookieId);
             }
             $scope.cookieId = cookieId;
-            console.debug($scope.page.users);
+            //console.debug($scope.page.users);
             if($scope.page.users[cookieId]) {
                 $scope.currentUser = {name: $scope.page.users[cookieId]};
             }
+            $scope.rev = slidangular.rev;
         }
     }
 });
@@ -66,16 +67,29 @@ slidangular.config(function ($routeProvider) {
             template:  '<div ng-include="\'html/slide/\' + name + \'.html?rev=' + slidangular.rev + '\'"></div>',
             controller: 'SlideController'
         })
+        .when('/image/:url/:width', {
+            template: '<img src="{{ url }}" class="vcenter" style="width: {{ width }}%; margin: auto {{ margin }}%" />',
+            controller: 'ImageController'
+        })
         .when('/bits', {
             templateUrl: 'html/bits.html?rev=' + slidangular.rev,
             controller: 'BitsController'
         });
 });
-
+http://slidangular/#/image/http:;;slidangular;w3school;AngularJS-large.png
 slidangular.controller('SlideController', function($scope, $routeParams, FireBase) {
 
     FireBase.connect($scope, 'page');
     $scope.name = $routeParams.name;
+
+});
+
+slidangular.controller('ImageController', function($scope, $routeParams, FireBase) {
+
+    FireBase.connect($scope, 'page');
+    $scope.url = $routeParams.url.replace(/;/g, '/'); // + '?rev=' + slidangular.rev;
+    $scope.width = $routeParams.width || 100;
+    $scope.margin = (100 - $scope.width) / 2;
 
 });
 
