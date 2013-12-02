@@ -1,0 +1,20 @@
+<div code="html;chat.html"></div>
+<code>
+    slidangular.controller('ChatController', function($scope) {
+
+        $scope.message = {content: ''};
+
+        $scope.addMessage = function() {
+            $scope.page.chat.push({
+                from: $scope.currentUser.name, content: $scope.message.content
+            });
+            if($scope.page.chat.length > 20) {
+                $scope.page.chat.splice(0, 1);
+            }
+            $scope.page.users[$scope.cookieId] = $scope.currentUser.name;
+            $scope.message.content = "";
+            $('.chat input')[1].focus();
+        };
+    });
+</code>
+

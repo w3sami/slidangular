@@ -32,9 +32,9 @@
         <button ng-click="page.hideUrl = !page.hideUrl">{{ page.hideUrl && 'show' || 'hide' }} url</button>
     </div>
 </div>
-{{cookieId}}
+
 <div class="view-wrap">
-    <div ng-show="!page.hideUrl" id="url"><input type="text" ng-model="page.currentSlide.url" placeholder="Url"></div>
+    <div ng-show="!page.hideUrl" id="url"><input type="text" value="{{ page.currentSlide.url | hostify }}" placeholder="Url"></div>
 
     <div ng-include src="'html/chat.html?rev=' + rev"></div>
 

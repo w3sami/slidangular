@@ -1,0 +1,18 @@
+<div code="html;slide;code.html" ng-show="page.currentSlide.index == 0"></div>
+<code ng-show="page.currentSlide.index > 0">
+    # Routing
+    .when('/code/:type', {
+    template: '&lt;div code="{{'{{'}} type }}">&lt;/div>',
+    controller: 'CodeController'
+    })
+</code>
+<code ng-show="page.currentSlide.index > 0">
+    slidangular.controller('CodeController', function($scope, $routeParams) {
+        $scope.type = $routeParams.type;
+    });
+</code>
+<div code="js;codeDirective.js" ng-show="page.currentSlide.index > 0"></div>
+current slide: {{ page.currentSlide.index }}
+
+
+

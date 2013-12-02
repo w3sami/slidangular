@@ -11,10 +11,12 @@ slidangular.factory('FireBase', function(angularFire)
                 currentSlideIndex: 0,
                 chat: [],
                 users: {},
-                chatEnabled: true
+                chatEnabled: false
             };
 
             var fbRef = new Firebase("https://slidangular.firebaseio.com/" + name);
+            //var auth = new FirebaseSimpleLogin(fbRef, function(error, user) { });
+            //auth.login('github');
             return angularFire(fbRef, $scope, name);
         }
     };
@@ -40,17 +42,13 @@ slidangular.factory('User', function($cookieStore)
     }
 });
 
-//var auth = new FirebaseSimpleLogin(fbRef, function(error, user) { });
-//auth.login('github');
+
 
 slidangular.rev = Math.random();
 
 slidangular.config(function ($routeProvider) {
 
     $routeProvider
-        .when('/index.html', {
-            redirectTo: '/edit'
-        })
         .when('/edit', {
             templateUrl: 'html/edit.html?rev=' + slidangular.rev,
             controller: 'EditController'
@@ -76,6 +74,7 @@ slidangular.config(function ($routeProvider) {
             controller: 'BitsController'
         });
 });
+
 slidangular.controller('SlideController', function($scope, $routeParams, FireBase) {
 
     FireBase.connect($scope, 'page');
@@ -83,14 +82,18 @@ slidangular.controller('SlideController', function($scope, $routeParams, FireBas
 
 });
 
-
-
 slidangular.filter('hostify', function() {
     return function(url) {
+        if(!url) {
+            return url;
+        }
         if(url.indexOf('http://') == -1) {
             var host = window.location.host;
             if(host.indexOf('http://') == -1) {
                 host = 'http://' + host;
+            }
+            if(host.indexOf('slidangular') == -1) {
+                host = '/slidangular' + host;
             }
             url = host + '/index.html#/' + url;
         }
@@ -103,7 +106,8 @@ slidangular.controller('ImageController', function($scope, $routeParams, FireBas
     FireBase.connect($scope, 'page');
     var url = $routeParams.url.replace(/;/g, '/'); // + '?rev=' + slidangular.rev;
 
-    $scope.url = $filter('hostify')(url);
+    $scope.url = $filter('hostify')(url).replace('/index.html#', '');
+
     $scope.width = $routeParams.width || 100;
 
 });
@@ -146,7 +150,10 @@ slidangular.controller('ViewController', function($scope, FireBase, Iframe, $coo
     $scope.render = function(slide)
     {
         if(!slide) return;
-        if(!slide.url) slide.url = 'http://talmantalli.fi';
+        if(!slide.url) {
+            slide.url = '';
+            return;
+        }
         return Iframe.render($filter('hostify')(slide.url));
     };
 });
@@ -172,8 +179,6 @@ slidangular.controller('EditController', function($scope, Iframe, FireBase, User
     FireBase.connect($scope, 'page').then(function(){
         User.get($scope);
     });
-
-    //var copy = JSON.parse(JSON.stringify($scope.page));
 
     $scope.add = function(e) {
         $scope.page.slides.push({name: $scope.newName, url: $scope.newUrl});
@@ -204,18 +209,25 @@ slidangular.controller('EditController', function($scope, Iframe, FireBase, User
     $scope.render = function(slide)
     {
         if(!slide) return;
-        if(!slide.url) slide.url = 'http://talmantalli.fi';
+        if(!slide.url) {
+            slide.url = '';
+            return;
+        }
         return Iframe.render($filter('hostify')(slide.url));
     };
 
     $scope.prev = function()
     {
-        if($scope.page.currentSlide.index) $scope.page.currentSlide.index --;
+        if($scope.page.currentSlide.index) {
+            $scope.page.currentSlide.index --;
+        }
     };
 
     $scope.next = function()
     {
-        if($scope.page.currentSlide.index < $scope.page.currentSlide.pages) $scope.page.currentSlide.index ++;
+        if($scope.page.currentSlide.index < $scope.page.currentSlide.pages) {
+            $scope.page.currentSlide.index ++;
+        }
     };
 
     $scope.zero = function()
@@ -243,72 +255,28 @@ slidangular.directive('ngBlur', function() {
 });
 
 slidangular.directive('code', function($http, $timeout) {
-    return function(scope, element, attributes) {
-        //if(!attributes.code) return;
-        $timeout(function(){
-            $http.get(attributes.code.replace(/;/g, '/') + '?rev=' + slidangular.rev).success(function(html) {
-                element.html('<pre class="prettyprint">' +
-                    $('<div>').text(html).html() + // html encode the data
-                    '</pre>'
-                );
-                window.prettyPrint();
-            });
-        });
-
-    };
-});
-
-slidangular.directive('edit', function($http) {
-    return function(scope, element, attributes) {
-        $http.get(attributes.code.replace(/;/g, '/') + '?rev=' + slidangular.rev).success(function(html) {
-            element.html('<pre class="prettyprint">' +
-                $('<div>').text(html).html() + // html encode the data
-                '</pre>'
-            );
-            window.prettyPrint();
-        });
-
-    };
-});
-
-slidangular.directive('bits', function() {
     return {
-        restrict: 'E',
-        scope: {
-            model: '=',
-            values: '=',
-            select: '='
-        },
-        template: '<ul class="button-group">' +
-            '<li ng-repeat="value in values">' +
-            '<a href="" class="small button secondary" ng-class="class(value)" ng-click="click(value)"></a>' +
-            '</li>' +
-            '</ul>',
-        link: function(scope, element) {
-            scope.click = function (selected) {
-                if (scope.model == selected.value) {
-                    scope.model = '';
+        restrict: 'EA',
+        link: function(scope, element, attributes) {
+            $timeout(function(){
+                if(attributes.code) {
+                    $http.get(attributes.code.replace(/;/g, '/') + '?rev=' + slidangular.rev).success(function(html) {
+                        element.html('<pre class="prettyprint">' +
+                            $('<div>').text(html).html() + // html encode the data
+                            '</pre>'
+                        );
+                        window.prettyPrint();
+                    });
+                } else {
+                    // does not work with {{ }}, since they get parsed before
+                    element.html('<pre class="prettyprint">' +
+                        element.html() +
+                        '</pre>'
+                    );
+                    window.prettyPrint();
                 }
-                else {
-                    scope.model = selected.value;
-                }
-
-                if (scope.select) {
-                    scope.select(scope.model);
-                }
-
-                $(element).find('.button').blur();
-            };
-
-            scope.class = function (current) {
-                var cssClass = current.icon;
-
-                if (scope.model == current.value) {
-                    cssClass += ' selected';
-                }
-
-                return cssClass;
-            };
+            });
         }
     }
 });
+

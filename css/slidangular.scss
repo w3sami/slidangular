@@ -16,6 +16,14 @@
   position: absolute;
 }
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
+pre.prettyprint {
+  width: 95%;
+}
+
 .chat {
   background: none repeat scroll 0 0 rgba(0, 50, 114, 0.92);
   border-radius: 13px;
@@ -46,6 +54,10 @@ ul, li {
   width: 20%;
   float: left;
 
+  button {
+    padding: 20px;
+  }
+
   ul {
     width: 300px;
     float: left;
@@ -53,7 +65,7 @@ ul, li {
     overflow-y: auto;
     li {
       list-style-type: none;
-      padding: 5px;
+      padding: 15px;
       background: lightblue;
       margin-bottom: 2px;
       border: 1px solid grey;
@@ -134,6 +146,7 @@ ul, li {
   .h#{$i} {height: #{$i*1%};}
   .t#{$i} {top: #{$i*1%};}
   .l#{$i} {left: #{$i*1%};}
+  .m#{$i} {margin: #{$i*1%};}
   .o#{$i} {opacity: #{$i/100};}
 }
 

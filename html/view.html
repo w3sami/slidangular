@@ -1,5 +1,4 @@
-<div ng-show="!page.hideUrl" id="url"><input type="text" ng-model="page.currentSlide.url" disabled="disabled"></div>
+<div ng-show="!page.hideUrl" id="url"><input type="text" value="{{ page.currentSlide.url | hostify }}"></div>
 <div ng-include src="'html/chat.html?rev=' + rev"></div>
 <div id="view" ng-bind-html-unsafe="render(page.currentSlide)"></div>
-<div id="mask">
-</div>
+<div id="mask"></div>
