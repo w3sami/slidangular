@@ -93,7 +93,7 @@ slidangular.filter('hostify', function() {
                 host = 'http://' + host;
             }
             if(host.indexOf('slidangular') == -1) {
-                host = '/slidangular' + host;
+                host += '/slidangular';
             }
             url = host + '/index.html#/' + url;
         }
