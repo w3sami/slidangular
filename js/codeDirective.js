@@ -1,5 +1,4 @@
 slidangular.directive('code', function($http, $timeout) {
-    alert('woot');
     return {
         restrict: 'EA',
         link: function(scope, element, attributes) {
