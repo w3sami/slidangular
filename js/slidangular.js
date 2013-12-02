@@ -68,7 +68,7 @@ slidangular.config(function ($routeProvider) {
             controller: 'SlideController'
         })
         .when('/image/:url/:width', {
-            template: '<img src="{{ url }}" class="vcenter" style="width: {{ width }}%; margin: auto {{ margin }}%" />',
+            template: '<img src="{{ url }}" class="vcenter w{{ width }}" />',
             controller: 'ImageController'
         })
         .when('/bits', {
@@ -76,7 +76,6 @@ slidangular.config(function ($routeProvider) {
             controller: 'BitsController'
         });
 });
-http://slidangular/#/image/http:;;slidangular;w3school;AngularJS-large.png
 slidangular.controller('SlideController', function($scope, $routeParams, FireBase) {
 
     FireBase.connect($scope, 'page');
@@ -84,12 +83,28 @@ slidangular.controller('SlideController', function($scope, $routeParams, FireBas
 
 });
 
-slidangular.controller('ImageController', function($scope, $routeParams, FireBase) {
+
+
+slidangular.filter('hostify', function() {
+    return function(url) {
+        if(url.indexOf('http://') == -1) {
+            var host = window.location.host;
+            if(host.indexOf('http://') == -1) {
+                host = 'http://' + host;
+            }
+            url = host + '/index.html#/' + url;
+        }
+        return url;
+    };
+});
+
+slidangular.controller('ImageController', function($scope, $routeParams, FireBase, $filter) {
 
     FireBase.connect($scope, 'page');
-    $scope.url = $routeParams.url.replace(/;/g, '/'); // + '?rev=' + slidangular.rev;
+    var url = $routeParams.url.replace(/;/g, '/'); // + '?rev=' + slidangular.rev;
+
+    $scope.url = $filter('hostify')(url);
     $scope.width = $routeParams.width || 100;
-    $scope.margin = (100 - $scope.width) / 2;
 
 });
 
@@ -122,7 +137,7 @@ slidangular.controller('BitsController', function($scope) {
 slidangular.controller('SlidangularController', function($scope) {
 });
 
-slidangular.controller('ViewController', function($scope, FireBase, Iframe, $cookieStore, User) {
+slidangular.controller('ViewController', function($scope, FireBase, Iframe, $cookieStore, User, $filter) {
 
     FireBase.connect($scope, 'page').then(function(){
         User.get($scope);
@@ -132,7 +147,7 @@ slidangular.controller('ViewController', function($scope, FireBase, Iframe, $coo
     {
         if(!slide) return;
         if(!slide.url) slide.url = 'http://talmantalli.fi';
-        return Iframe.render(slide.url);
+        return Iframe.render($filter('hostify')(slide.url));
     };
 });
 
@@ -152,7 +167,7 @@ slidangular.controller('ChatController', function($scope) {
         $('.chat input')[1].focus();
     };
 });
-slidangular.controller('EditController', function($scope, Iframe, FireBase, User) {
+slidangular.controller('EditController', function($scope, Iframe, FireBase, User, $filter) {
 
     FireBase.connect($scope, 'page').then(function(){
         User.get($scope);
@@ -190,7 +205,7 @@ slidangular.controller('EditController', function($scope, Iframe, FireBase, User
     {
         if(!slide) return;
         if(!slide.url) slide.url = 'http://talmantalli.fi';
-        return Iframe.render(slide.url);
+        return Iframe.render($filter('hostify')(slide.url));
     };
 
     $scope.prev = function()
